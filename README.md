@@ -13,7 +13,7 @@ Request constraints:
 Query string parameters:
 - ```temp=[true |false]```:  
   If set to true, file is uploaded to temporary directory on server, otherwise file is uploaded to default file directory on server. Can be omitted as default is set to ```false```.
-- ```keepname=[True|False]```:  
+- ```keepname=[true|false]```:  
   If set to true, uploaded file keeps original file name, otherwise uploaded file is renamed. Can be omitted as default value is set to ```false```.
 
 > Sample request  
@@ -58,7 +58,7 @@ Request payload:
 Query string parameters:
 - ```temp=[true |false]```:  
   If set to true, file is uploaded to temporary directory on server, otherwise file is uploaded to default file directory on server. Can be ommited as default is set to ```false```.
-- ```keepname=[True|False]```:  
+- ```keepname=[true|false]```:  
   If set to true, uploaded file keeps original file name, otherwise uploaded file is renamed. Can be omited as default value is set to ```false```.
 
 
