@@ -19,7 +19,7 @@ Query string parameters:
 > Sample request  
 ```bash
 curl -X POST \
-  http://HTTP_HOST:[HTTP_PORT]/api/files/ \
+  http://[HTTP_HOST]:[HTTP_PORT]/api/files/ \
   -H 'Host: [HTTP_HOST]:[HTTP_PORT]' \
   -H 'content-length: 11479217' \
   -H 'content-type: multipart/form-data' \
@@ -65,9 +65,9 @@ Query string parameters:
 > Sample request  
 ```bash
 curl -X POST \
-  'http://localhost:53198/api/files/base64-images/?keepname=false&temp=false' \
+  'http://[HTTP_HOST]:[HTTP_PORT]/api/files/base64-images/?keepname=false&temp=false' \
   -H 'Content-Type: application/json' \
-  -H 'Host: localhost:53198' \
+  -H 'Host: [HTTP_HOST]:[HTTP_PORT]' \
   -H 'content-length: 24738' \
   -d '[
         {
