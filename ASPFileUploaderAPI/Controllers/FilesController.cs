@@ -22,7 +22,74 @@ namespace ASPFileUploaderAPI.Controllers
         private static readonly string UPLOAD_PATH = ConfigurationManager.AppSettings["uploadPath"];
         private static readonly string Base64ImageDataRegex = "(?:[Dd][Aa][Tt][Aa]\\s*\\:\\s*([Ii][Mm][Aa][Gg][Ee]\\s*\\/\\s*([^\\s]*?))?\\s*;\\s*[Bb][Aa][Ss][Ee]64\\s*,\\s*)(.+)";
 
+        [HttpGet]
+        [Route("api/files/temp/")]
+        public IHttpActionResult GetTempReference()
+        {
+            string uploadDir = HttpContext.Current.Server.MapPath("~/files/temp");
+            string refName = Guid.NewGuid().ToString();
+            string refDir = Path.Combine(uploadDir, refName);
+            if(Directory.Exists(refDir))
+            {
+                return InternalServerError(new Exception($"duplicated ref: {refName}"));
+            }
+            Directory.CreateDirectory(refDir);
+            return Ok(refName);
+            
+        }
 
+        [HttpPost]
+        [Route("api/files/temp/")]
+        public async Task<IHttpActionResult> UploadTempFiles([FromUri(Name = "ref")] string refid = "")
+        {
+            if (!Request.Content.IsMimeMultipartContent())
+            {
+                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+            }
+            if(string.IsNullOrEmpty(refid) || string.IsNullOrWhiteSpace(refid))
+            {
+                return BadRequest("Missing upload reference");
+            }
+
+            string uploadDir = HttpContext.Current.Server.MapPath($"~/files/temp/{refid}");
+            string uploadPath = $"/files/temp/{refid}";
+
+            if (!Directory.Exists(uploadDir))
+            {
+                return BadRequest($"Missing upload reference: {refid}");
+            }
+            var provider = new MultipartFormDataStreamProvider(uploadDir);
+            try
+            {
+                var uploadedFiles = new List<FormFileResponseVO>();
+                await Request.Content.ReadAsMultipartAsync(provider);
+
+                foreach (var file in provider.FileData)
+                {
+                    string name = file.Headers.ContentDisposition.Name.Trim('"');
+                    string fileName = file.Headers.ContentDisposition.FileName.Trim('"');
+
+                    /*Calculate fileuri*/
+                    string localFilePath = Path.Combine(uploadDir, fileName);
+                    string fileUri = $"{uploadPath}/{fileName}";
+                    if (File.Exists(localFilePath))
+                    {
+                        File.Delete(localFilePath);
+                    }
+                    File.Move(file.LocalFileName, localFilePath);
+                    uploadedFiles.Add(
+                        new FormFileResponseVO(
+                            name, fileName, 0, null, fileUri, null)
+                    );
+
+                }
+                return Ok(uploadedFiles);
+            }
+            catch (Exception e)
+            {
+                return InternalServerError(e);
+            }
+        }
 
         [HttpGet]
         public IHttpActionResult GetFileMetadata([FromUri(Name = "name")] string fileName, [FromUri] bool temp = false)
