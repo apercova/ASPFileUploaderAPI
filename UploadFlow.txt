@@ -1,0 +1,9 @@
+ask for an upload reference
+post temp files with the reference
+when confirm file(save):
+	obtain reference from file path
+	move file from temp reference folder to uploads folder
+	delete temp reference folder;
+	
+*Note:
+Ask for an individual reference for each file to upload.
